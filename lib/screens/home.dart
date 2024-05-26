@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jkt48_app/model/jkt48_model.dart';
+import 'package:jkt48_app/screens/detail.dart';
 import 'package:jkt48_app/utils/api_data_source.dart';
 
 class HomePage extends StatefulWidget {
@@ -40,7 +41,7 @@ class _HomePageState extends State<HomePage> {
           },
           icon: Icon(Icons.logout_sharp),
         ),
-        backgroundColor: Colors.deepPurpleAccent,
+        backgroundColor: Colors.red,
         title: Text(_appBarTitles[_selectedIndex],
             style: TextStyle(color: Colors.white)),
       ),
@@ -61,7 +62,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.deepPurpleAccent,
+        selectedItemColor: Colors.red,
         onTap: _onItemTapped,
       ),
     );
@@ -85,13 +86,25 @@ class HomeScreen extends StatelessWidget {
           }
           if (snapshot.hasData) {
             DataMember member = DataMember.fromJson(snapshot.data);
-            return ListView.builder(
+            return GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 8.0,
+                crossAxisSpacing: 8.0,
+                childAspectRatio: 0.75,
+              ),
               itemCount: member.members?.length ?? 0,
               itemBuilder: (BuildContext context, int index) {
                 final memberData = member.members?[index];
                 return InkWell(
                   onTap: () {
-                    // Handle member tap if needed
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            DetailPage(detail: member.members![index]),
+                      ),
+                    );
                   },
                   child: Container(
                     margin: EdgeInsets.all(8.0),
@@ -100,41 +113,38 @@ class HomeScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                       elevation: 5,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          children: [
-                            Container(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: Container(
                               child: memberData?.photoUrl != null
                                   ? Image.network(
                                       memberData!.photoUrl!,
-                                      height: 100,
-                                      width: 100,
-                                      // fit: BoxFit.cover,
+                                      fit: BoxFit.cover,
                                     )
                                   : Container(
-                                      height: 100,
-                                      width: 100,
                                       color: Colors.grey,
                                     ),
                             ),
-                            SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    memberData?.name ?? 'No Name',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Container(
+                              padding: EdgeInsets.all(8.0),
+                              alignment: Alignment.center,
+                              child: Text(
+                                memberData?.name ?? 'No Name',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
