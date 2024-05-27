@@ -56,10 +56,10 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            if (_selectedIndex == 0) // Only show search bar on the 'Member' tab
+            if (_selectedIndex == 0)
               SizedBox(
-                width: 200, // Set the width of the search bar
-                height: 36, // Set the height of the search bar
+                width: 200,
+                height: 36,
                 child: TextField(
                   controller: _searchController,
                   onChanged: _updateSearchQuery,
