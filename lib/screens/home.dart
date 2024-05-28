@@ -4,26 +4,26 @@ import 'package:jkt48_app/screens/detail.dart';
 import 'package:jkt48_app/utils/api_data_source.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
-
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
-
-  static List<Widget> _widgetOptions = <Widget>[
-    HomeScreen(),
-    BookmarkScreen(),
-    ProfilePage(),
-  ];
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
   static const List<String> _appBarTitles = <String>[
     'Member',
     'Event',
+    'Notification',
     'Profile',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -31,45 +31,97 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void _updateSearchQuery(String newQuery) {
+    setState(() {
+      _searchQuery = newQuery;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            // Handle logout functionality
-          },
-          icon: Icon(Icons.logout_sharp),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                _appBarTitles[_selectedIndex],
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            if (_selectedIndex == 0) // Only show search bar on the 'Member' tab
+              SizedBox(
+                width: 200, // Set the width of the search bar
+                height: 36, // Set the height of the search bar
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: _updateSearchQuery,
+                  decoration: InputDecoration(
+                    hintText: 'Search...',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide(color: Colors.grey),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide(color: Colors.grey),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide(color: Colors.red),
+                    ),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 0, horizontal: 8),
+                    suffixIcon: Icon(
+                      Icons.search,
+                      color: Colors.black,
+                    ),
+                  ),
+                  style: TextStyle(color: Colors.black, fontSize: 16),
+                ),
+              ),
+          ],
         ),
-        backgroundColor: Colors.red,
-        title: Text(_appBarTitles[_selectedIndex],
-            style: TextStyle(color: Colors.white)),
+        actions: [],
       ),
-      body: _widgetOptions.elementAt(_selectedIndex),
+      body: _widgetOptions[_selectedIndex](searchQuery: _searchQuery),
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Member'),
+          BottomNavigationBarItem(icon: Icon(Icons.event), label: 'Event'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Member',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark),
-            label: 'Event',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: 'Profile',
-          ),
+              icon: Icon(Icons.notifications), label: 'Notifications'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.red,
+        unselectedItemColor: Colors.grey,
         onTap: _onItemTapped,
+        backgroundColor: Colors.white,
       ),
     );
+  }
+
+  List<Widget Function({required String searchQuery})> get _widgetOptions {
+    return <Widget Function({required String searchQuery})>[
+      ({required String searchQuery}) => HomeScreen(searchQuery: searchQuery),
+      ({required String searchQuery}) => EventScreen(),
+      ({required String searchQuery}) => ProfilePage(),
+    ];
   }
 }
 
 class HomeScreen extends StatelessWidget {
+  final String searchQuery;
+
+  HomeScreen({required this.searchQuery});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -86,6 +138,10 @@ class HomeScreen extends StatelessWidget {
           }
           if (snapshot.hasData) {
             DataMember member = DataMember.fromJson(snapshot.data);
+            var filteredMembers = member.members?.where((m) {
+              return m.name!.toLowerCase().contains(searchQuery.toLowerCase());
+            }).toList();
+
             return GridView.builder(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
@@ -93,16 +149,16 @@ class HomeScreen extends StatelessWidget {
                 crossAxisSpacing: 8.0,
                 childAspectRatio: 0.75,
               ),
-              itemCount: member.members?.length ?? 0,
+              itemCount: filteredMembers?.length ?? 0,
               itemBuilder: (BuildContext context, int index) {
-                final memberData = member.members?[index];
+                final memberData = filteredMembers?[index];
                 return InkWell(
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
-                            DetailPage(detail: member.members![index]),
+                            DetailPage(detail: filteredMembers![index]),
                       ),
                     );
                   },
@@ -161,11 +217,11 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class BookmarkScreen extends StatelessWidget {
+class EventScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text("Bookmark Screen"),
+      child: Text("Event Screen"),
     );
   }
 }
