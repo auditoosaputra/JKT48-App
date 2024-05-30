@@ -17,7 +17,7 @@ class _HomePageState extends State<HomePage> {
   static const List<String> _appBarTitles = <String>[
     'Member',
     'Event',
-    'Notification',
+    'Feedback',
     'Profile',
   ];
 
@@ -89,15 +89,13 @@ class _HomePageState extends State<HomePage> {
               ),
           ],
         ),
-        actions: [],
       ),
       body: _widgetOptions[_selectedIndex](searchQuery: _searchQuery),
       bottomNavigationBar: BottomNavigationBar(
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Member'),
           BottomNavigationBarItem(icon: Icon(Icons.event), label: 'Event'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.notifications), label: 'Notifications'),
+          BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Feedback'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
         currentIndex: _selectedIndex,
@@ -113,7 +111,7 @@ class _HomePageState extends State<HomePage> {
     return <Widget Function({required String searchQuery})>[
       ({required String searchQuery}) => MemberPage(searchQuery: searchQuery),
       ({required String searchQuery}) => EventPage(),
-      ({required String searchQuery}) => NotificationPage(),
+      ({required String searchQuery}) => FeedbackPage(),
       ({required String searchQuery}) => ProfilePage(),
     ];
   }
