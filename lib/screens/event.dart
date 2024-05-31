@@ -20,8 +20,8 @@ class _EventPageState extends State<EventPage> {
   Widget build(BuildContext context) {
     List<Members> DataEvent;
 
-    return Container(
-      child: FutureBuilder(
+    return Scaffold(
+      body: FutureBuilder(
           future: ApiDataSource.instance.loadData(),
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
             if (snapshot.hasError) {
@@ -35,85 +35,38 @@ class _EventPageState extends State<EventPage> {
             if (snapshot.hasData) {
               DataJKT48 event = DataJKT48.fromJson(snapshot.data);
 
-              // if (DataEvent.isEmpty) {
-              //   return _noDataFound();
-              // }
-
-              return Scaffold(
-                body: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 8.0,
-                    crossAxisSpacing: 8.0,
-                    childAspectRatio: 0.75,
+              return Column(
+                children: [
+                  Expanded(
+                    child: GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 8.0,
+                        crossAxisSpacing: 8.0,
+                        childAspectRatio: 0.75,
+                      ),
+                      itemCount: event.events?.length ?? 0,
+                      itemBuilder: (context, index) =>
+                          _inkWell(event.events![index]),
+                    ),
                   ),
-                  itemCount: event.events?.length ?? 0,
-                  itemBuilder: (context, index) =>
-                      _itemIW(event.events![index]),
-                  // (BuildContext context, int index) {
-                  //   final eventData = event.events?[index];
-                  //   return InkWell(
-                  //     onTap: () {
-                  //       print('tes');
-                  //       if (eventData != null) {
-                  //         Navigator.pushReplacement(
-                  //           context,
-                  //           MaterialPageRoute(
-                  //             builder: (context) => EventDetailPage(
-                  //                 detail: eventData), // Remove [index]
-                  //           ),
-                  //         );
-                  //       }
-                  //     },
-                  //     child: Container(
-                  //       margin: EdgeInsets.all(8.0),
-                  //       child: Card(
-                  //         shape: RoundedRectangleBorder(
-                  //           borderRadius: BorderRadius.circular(10.0),
-                  //         ),
-                  //         elevation: 5,
-                  //         child: Column(
-                  //           crossAxisAlignment: CrossAxisAlignment.stretch,
-                  //           children: [
-                  //             Expanded(
-                  //               flex: 3,
-                  //               child: Container(
-                  //                 child: eventData?.photoUrl != null
-                  //                     ? Image.network(
-                  //                         eventData!.photoUrl!,
-                  //                         fit: BoxFit.cover,
-                  //                       )
-                  //                     : Container(
-                  //                         color: Colors.grey,
-                  //                       ),
-                  //               ),
-                  //             ),
-                  //             Expanded(
-                  //               flex: 1,
-                  //               child: Container(
-                  //                 padding: EdgeInsets.all(8.0),
-                  //                 alignment: Alignment.center,
-                  //                 child: Text(
-                  //                   eventData?.name ?? 'No Name',
-                  //                   style: TextStyle(
-                  //                     fontSize: 16,
-                  //                     fontWeight: FontWeight.bold,
-                  //                   ),
-                  //                   textAlign: TextAlign.center,
-                  //                 ),
-                  //               ),
-                  //             ),
-                  //           ],
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   );
-                  //     },
-                  //   );
-                ),
+                  if (widget.name != null)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => HomePage()),
+                          );
+                        },
+                        child: Text('Back'),
+                      ),
+                    ),
+                ],
               );
             }
-            ;
             return Center(
               child: Text("No Data Available"),
             );
@@ -121,7 +74,7 @@ class _EventPageState extends State<EventPage> {
     );
   }
 
-  Widget _itemIW(Events eventData) {
+  Widget _inkWell(Events eventData) {
     return InkWell(
       onTap: () {
         print('tes');
@@ -150,7 +103,7 @@ class _EventPageState extends State<EventPage> {
                 child: Container(
                   child: eventData?.photoUrl != null
                       ? Image.network(
-                          eventData!.photoUrl!,
+                          eventData.photoUrl!,
                           fit: BoxFit.cover,
                         )
                       : Container(
@@ -164,7 +117,7 @@ class _EventPageState extends State<EventPage> {
                   padding: EdgeInsets.all(8.0),
                   alignment: Alignment.center,
                   child: Text(
-                    eventData?.name ?? 'No Name',
+                    eventData.name ?? 'No Name',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
