@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jkt48_app/screens/member.dart';
 import 'package:jkt48_app/screens/event.dart';
-import 'package:jkt48_app/screens/notification.dart';
+import 'package:jkt48_app/screens/feedback.dart';
 import 'package:jkt48_app/screens/profile.dart';
 
 class HomePage extends StatefulWidget {
