@@ -19,18 +19,21 @@ class _RegisterPageState extends State<RegisterPage> {
   final passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  // Define encryption key and IV
   final key = encrypt.Key.fromUtf8('my 32 length key................');
   final iv = encrypt.IV.fromUtf8("1234567890123456");
 
   late SharedPreferences pref;
 
+  // Function to encrypt data using AES encryption
   String encryptData(String plainText) {
     final encrypter = encrypt.Encrypter(encrypt.AES(key));
 
     final encrypted = encrypter.encrypt(plainText, iv: iv);
-    return encrypted.base64;
+    return encrypted.base64; // Return encrypted data in base64 format
   }
 
+  // Function to print contents of the Hive database for debugging
   void printDatabaseContents() async {
     var userBox = await Hive.openBox<User>("userBox");
     print("Database Contents:");
@@ -40,11 +43,12 @@ class _RegisterPageState extends State<RegisterPage> {
     await userBox.close();
   }
 
+  // Function to register a new user
   void registerUser() async {
     var userBox = await Hive.openBox<User>("userBox");
     pref = await SharedPreferences.getInstance();
 
-    // Check if the username already exists
+    // Check if the username already exists in the database
     bool userFound =
         userBox.values.any((user) => user.username == usernameController.text);
 
@@ -56,14 +60,17 @@ class _RegisterPageState extends State<RegisterPage> {
         duration: Duration(seconds: 2),
       ));
     } else {
+      // Encrypt the password before storing it
       var encryptedPassword = encryptData(passwordController.text);
 
+      // Create a new user object
       var user = User(
         username: usernameController.text,
         password: encryptedPassword,
         eventHistory: [],
       );
 
+      // Add the new user to the Hive database
       await userBox.add(user);
 
       // Set the accIndex based on the count of users in the Hive box
@@ -73,6 +80,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
       printDatabaseContents(); // Call the function here
 
+      // Navigate to the Login page after successful registration
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
         return LoginPage();
       }));
@@ -165,7 +173,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 }));
                               },
                               child: const Text(
-                                "Already have an account? Login here",
+                                "Already have an account?",
                                 style: TextStyle(
                                     decoration: TextDecoration.underline,
                                     fontWeight: FontWeight.w300),
@@ -205,7 +213,7 @@ class _RegisterPageState extends State<RegisterPage> {
           top: 50,
           left: MediaQuery.of(context).size.width - 100,
           child: Image.asset(
-            'JKT48_logo.png',
+            'assets/JKT48_logo.png',
             width: 100,
             height: 100,
           ),

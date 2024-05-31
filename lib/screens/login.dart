@@ -17,24 +17,24 @@ class _LoginPageState extends State<LoginPage> {
   late SharedPreferences pref;
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
-  // String? user;
-  // String? pass;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final key = encrypt.Key.fromUtf8('my 32 length key................');
   final iv = encrypt.IV.fromUtf8("1234567890123456");
 
+  // Function to check user input for login
   void checkInputForLogin() async {
     var userBox = await Hive.openBox<User>("userBox");
     bool userFound = false; // Flag to track if credentials match
 
+    // Iterate over the userBox to find matching username and decrypted password
     for (int i = 0; i < userBox.length; i++) {
       if (userBox.getAt(i)!.username == usernameController.text &&
           decryptData(userBox.getAt(i)!.password) == passwordController.text) {
         userFound = true; // Set flag to true if credentials match
         pref = await SharedPreferences.getInstance();
-        pref.setBool("logedIn", true);
-        pref.setInt("accIndex", i);
+        pref.setBool("logedIn", true); // Set session logged in status
+        pref.setInt("accIndex", i); // Store account index in SharedPreferences
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => HomePage()));
         break; // Exit the loop since credentials are found and valid
@@ -53,6 +53,7 @@ class _LoginPageState extends State<LoginPage> {
     await userBox.close(); // Close the Hive box
   }
 
+  // Function to clear the userBox (for testing or reset purposes)
   void clearUserBox() async {
     var userBox = await Hive.openBox<User>("userBox");
     await userBox.clear();
@@ -60,31 +61,33 @@ class _LoginPageState extends State<LoginPage> {
     print("All data in the userBox has been cleared.");
   }
 
+  // Function to decrypt the password
   String decryptData(String encryptText) {
     final encrypter = encrypt.Encrypter(encrypt.AES(key));
 
-    final decrypted = encrypter.decrypt64(encryptText, iv: iv);
+    final decrypted = encrypter.decrypt64(encryptText, iv: iv); // Decrypt data using the same IV and key
 
-    return decrypted;
+    return decrypted; // Return the decrypted text
   }
 
+  // Function to check if user is already logged in
   void checkIfLogedIn() async {
     pref = await SharedPreferences.getInstance();
 
-    bool logedIn = pref.getBool("logedIn") ?? false;
+    bool logedIn = pref.getBool("logedIn") ?? false; // Check the login status from SharedPreferences
 
     if (logedIn) {
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
         return HomePage();
       }));
-    } else {}
+    }
   }
 
   @override
   void initState() {
     super.initState();
-    checkIfLogedIn();
-    // clearUserBox();
+    checkIfLogedIn(); // Check if user is already logged in when initializing
+    // clearUserBox(); // Uncomment to clear userBox (useful for testing)
   }
 
   @override
@@ -163,9 +166,8 @@ class _LoginPageState extends State<LoginPage> {
                               }));
                             },
                             child: const Text(
-                              "You don't have an account yet? Register here",
+                              "You don't have an account?",
                               style: TextStyle(
-                                  fontSize: 12,
                                   decoration: TextDecoration.underline,
                                   fontWeight: FontWeight.w300),
                             ),
@@ -173,7 +175,7 @@ class _LoginPageState extends State<LoginPage> {
                           TextButton.icon(
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
-                                checkInputForLogin();
+                                checkInputForLogin(); // Call login check function
                               }
                             },
                             icon: Icon(Icons.login, color: Colors.white),
@@ -198,7 +200,7 @@ class _LoginPageState extends State<LoginPage> {
           top: 50,
           left: MediaQuery.of(context).size.width - 100,
           child: Image.asset(
-            'JKT48_logo.png',
+            'assets/JKT48_logo.png',
             width: 100,
             height: 100,
           ),
