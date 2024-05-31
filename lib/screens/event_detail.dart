@@ -117,27 +117,30 @@ class _EventDetailPageState extends State<EventDetailPage> {
                 height: 1.5,
               ),
             ),
-            SizedBox(height: 8),
-            Text(
-              'Member : ${widget.name ?? 'N/A'}',
-              style: TextStyle(
-                fontSize: 16,
-                height: 1.5,
+            if (widget.name != null)
+              SizedBox(height: 8),
+            if (widget.name != null)
+              Text(
+                'Member : ${widget.name}',
+                style: TextStyle(
+                  fontSize: 16,
+                  height: 1.5,
+                ),
               ),
-            ),
-            Center(
-              child: ElevatedButton(
-                onPressed: _saveEventAndNavigate,
-                child: Text(
-                  "Buy",
-                  style: TextStyle(
-                    fontSize: 16,
-                    height: 1.5,
-                    fontWeight: FontWeight.bold,
+            if (widget.name != null)
+              Center(
+                child: ElevatedButton(
+                  onPressed: _saveEventAndNavigate,
+                  child: Text(
+                    "Buy",
+                    style: TextStyle(
+                      fontSize: 16,
+                      height: 1.5,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
-            ),
           ],
         ),
       ),
