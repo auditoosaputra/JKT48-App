@@ -263,73 +263,85 @@ class _ProfilePageState extends State<ProfilePage> {
                       fontSize: 18,
                       fontWeight: FontWeight.bold)),
               SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Member',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+              if (eventHistory.isEmpty)
+                Center(
+                  child: Text(
+                    'No Data History',
+                    style: TextStyle(color: Colors.grey, fontSize: 16),
                   ),
-                  Expanded(
-                    child: Text(
-                      'Event',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                )
+              else
+                Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Member',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            'Event',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            'Time',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            'Price',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      'Time',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    SizedBox(height: 10),
+                    Column(
+                      children: eventHistory.map((event) {
+                        double price = double.parse(event.price!);
+                        double convertedPrice =
+                            _convertCurrency(price, _selectedCurrency);
+                        String currencySymbol;
+                        switch (_selectedCurrency) {
+                          case 'USD':
+                            currencySymbol = '\$';
+                            break;
+                          case 'YEN':
+                            currencySymbol = '¥';
+                            break;
+                          case 'IDR':
+                          default:
+                            currencySymbol = 'Rp';
+                            break;
+                        }
+                        return Row(
+                          children: [
+                            Expanded(
+                              child: Text(event.nama!),
+                            ),
+                            Expanded(
+                              child: Text('${event.name}'),
+                            ),
+                            Expanded(
+                              child: Text(
+                                  _convertTime(_selectedTime, '${event.time}')),
+                            ),
+                            Expanded(
+                              child: Text(
+                                  '$currencySymbol ${convertedPrice.toStringAsFixed(2)}'),
+                            ),
+                          ],
+                        );
+                      }).toList(),
                     ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      'Price',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10),
-              Column(
-                children: eventHistory.map((event) {
-                  double price = double.parse(event.price!);
-                  double convertedPrice =
-                      _convertCurrency(price, _selectedCurrency);
-                  String currencySymbol;
-                  switch (_selectedCurrency) {
-                    case 'USD':
-                      currencySymbol = '\$';
-                      break;
-                    case 'YEN':
-                      currencySymbol = '¥';
-                      break;
-                    case 'IDR':
-                    default:
-                      currencySymbol = 'Rp';
-                      break;
-                  }
-                  return Row(
-                    children: [
-                      Expanded(
-                        child: Text(event.nama!),
-                      ),
-                      Expanded(
-                        child: Text('${event.name}'),
-                      ),
-                      Expanded(
-                        child:
-                            Text(_convertTime(_selectedTime, '${event.time}')),
-                      ),
-                      Expanded(
-                        child: Text(
-                            '$currencySymbol ${convertedPrice.toStringAsFixed(2)}'),
-                      ),
-                    ],
-                  );
-                }).toList(),
-              ),
+                  ],
+                ),
               SizedBox(height: 30),
               Align(
                 alignment: Alignment.bottomRight,
